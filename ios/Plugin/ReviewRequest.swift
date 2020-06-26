@@ -9,7 +9,7 @@ private enum UserDefaultsKeys: String {
     case lastVersionPromptedForReviewKey
 }
 
-public final class ReviewRequest: C {
+public final class ReviewRequest {
     
     static let shared = ReviewRequest()
     private let reviewThresholdCount = 5
@@ -58,15 +58,17 @@ public final class ReviewRequest: C {
         }
     }
 
-    public func requestReview(){
+    public func requestReview() -> Bool{
         if isSameMajorMinorVersion(version1: currentVersion, version2: lastVersionPromptedForReview) {
-            return
+            return false
         }
-        DispatchQueue.main.asyncAfter(deadline: twoSecondsFromNow) {
+
+        DispatchQueue.main.async {
             SKStoreReviewController.requestReview()
             self.lastVersionPromptedForReview = self.currentVersion
             self.count = 0
         }
+        return true
     }
     
     public func requestReviewManually(for appId: Int) {
